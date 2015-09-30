@@ -1,8 +1,26 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+#CONSTANTS#
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #Imports
 import pygame, random, time, os, ctypes, ast
 from pygame.locals import *
-from tkinter import *
-import tkinter.tix as tix
+from Tkinter import *
+#import Tkinter.Tix as Tix
+
+#Colour Grid
+WHITE     = (255, 255, 255)
+BLACK     = (  0,   0,   0)
+RED       = (255,   0,   0)
+DARKPINK  = (255,  20, 147)
+GREEN     = (  0, 255,   0)
+DARKGREEN = (  0, 155,   0)
+ORANGE    = (255, 153,  18)
+DARKGRAY  = ( 40,  40,  40)
+YELLOW    = (255, 255,   0)
+BLUE      = (  0,   0, 255)
+KHAKI     = (139, 134,  78)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 #Read options from .ini
 f = open("options.ini","r")
@@ -15,7 +33,7 @@ line5=f.readline() #internal editor value
 line6=f.readline() #buttons header
 line7=f.readline() #buttons value
 line8=f.readline() #combat header
-line9=f.readable() #combat value'
+line9=f.readline() #combat value'
 if int(line5)==1:
     print("Enternal editor enabled")
     internal_editor=TRUE
@@ -35,19 +53,6 @@ else:
     combat_on=1
 f.close()
 
-#Colour Grid
-WHITE     = (255, 255, 255)
-BLACK     = (  0,   0,   0)
-RED       = (255,   0,   0)
-DARKPINK  = (255,  20, 147)
-GREEN     = (  0, 255,   0)
-DARKGREEN = (  0, 155,   0)
-ORANGE    = (255, 153,  18)
-DARKGRAY  = ( 40,  40,  40)
-YELLOW    = (255, 255,   0)
-BLUE      = (  0,   0, 255)
-KHAKI     = (139, 134,  78)
-
 windowWidth = 800
 windowHeight = 600
 lineColour = WHITE
@@ -57,7 +62,6 @@ cellWidth = int(windowWidth / cellSize)
 cellHeight = int(windowHeight / cellSize)
 
 pygame.init()
-screen=pygame.display.set_mode((0,0))
 
 class textures():
 
@@ -65,7 +69,7 @@ class textures():
         x = 0
         y = 0
 
-    class loadigTexture():
+    class loadingTexture():
         def __init__(self):
             self.x = 0
             self.y = 0
@@ -84,9 +88,9 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-#anything in this function will be done each time the playert moves - regardless if direction
+#Anything in this function will be done each time the playert moves - regardless if direction
 boss_list=[[20,40,60],[20,40,60],[0,1,1],[0,1,2]]
-def after_movement(playert_x, playert_y, boss_list):
+def afterMovement(playert_x, playert_y, boss_list):
     #x of boss, y of boss, 0 = one time only (the first time playert lands of square) or 1 = repeate (repeate regarless of how many times playert lands on square), boss ID
     if playert_x in boss_list[0]: #check if x of playert is contaiend in x section of array
         location_in_array=boss_list[0].index(int(playert_x)) #if so then take the possition of that x value and save it
@@ -102,7 +106,7 @@ def after_movement(playert_x, playert_y, boss_list):
     if espawn == 1:
         combat()
 
-def collision_detection(playert_x, playert_y,player):
+def collisionDetection(playert_x, playert_y,player):
     playert_position = str((playert_x, playert_y,player[15]))
     cannot_go_onto = open("Blocked.txt").read().splitlines()
     print(cannot_go_onto)
@@ -111,15 +115,15 @@ def collision_detection(playert_x, playert_y,player):
         return False
     return True
 
-#---------------------------------------------------------------------------------------------------------------------------------------------
-#combat system
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+#COMBAT SYSTEM#
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 name = "x"
-global combatover
+global combatOver
 class darkness:
     magnus = [100,25,15,30,20,["The sword of darkness",20],["The armour of despair",30],"Magnus, captain of despair",60,1,0,0,0]
 
 #list of classes and stats
-#vitality, endurance dexterity, intelligence, strength, weapon, auramor, name, exp, small orb, medium orb, large orb, mega orb, x cor, y cor, area
 #lancer is high attack, high dex, low defence, focused on killing the enemy very quickly
 lancer = [40,30,80,10,90,["lance",35],["super_light_armour",2],name,[0,20,1],10,0,0,0,0,0,1]
 #archeris a ranged high dex class, it has a wide range of abilities, like befriend and forage
@@ -144,7 +148,7 @@ classes = ["Warrior","Mage","Paladin","Necromancer","Barbarian","Lancer","Archer
 sakaretsu_armour = [50,30,20,0,"Sakaretsu armour",8,1,"Armour that increases offensive capability",0,0,10,0,0]
 simple_katanna = [60,0,0,0,"Katanna",8,0,"In the right hands this weapon is as deadly as any blade",0,60,0,0,0]
 
-def type_select(player_class):
+def typeSelect(player_class):
     global player
     player_class=str(player_class)
     print(player_class)
@@ -180,24 +184,19 @@ def type_select(player_class):
             print("Error - player class entered incorectly")
             player = "error"
             while player == "error":
-                classselect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja)
-    global map_number
-    map_number=player[15]
+                classSelect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja)
     return image
 
-def classselect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja):
-    global player, player_class, mana, mana_use   #moved global from the if statments to the top to cut down on the ammount needed
+def classSelect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja):
+    global player, player_class   #moved global from the if statments to the top to cut down on the ammount needed
     print("What is you're name?")
-    name = str(input("my name is:"))
+    name = raw_input(str("my name is:"))
     print("Choose you're class " + name)
     print(classes)
-    player_class = str(input())
+    player_class = str(raw_input())
     player_class = player_class.lower() #added .lower() to make sure that the input was lowercase so it wasn't case sensitvie
-    image=type_select(player_class) #loads player array and image
+    image=typeSelect(player_class) #loads player array and image
     player[7]=name
-    mana = player[3]*2
-    mana_use = mana
-    print(mana)
     print ("Are you ready?")
     return image
 
@@ -281,8 +280,8 @@ def statsetup (darkness,sakaretsu_armour,simple_katanna):
         return ehp,eend,edex,eint,estr,php,pend,pdex,pint,pstr,pw,pa
 
 # defining the function for the enemy turn
-def enemyturn ():
-    global combatover
+def enemyTurn ():
+    global combatOver
     global ehp,eend,edex,eint,estr,php,pend,pdex,pint,pstr,pw,pa
     echoice = random.randint(1,2)
     if echoice == 1:
@@ -295,7 +294,7 @@ def enemyturn ():
                 print("the enemy hits you for "+ str(enemyhit))
                 if php <= 0:
                     print("You died")
-                    combatover = True
+                    combatOver = True
             if enemyhit <= 0:
                 print("The enemy does no damage")
         else:
@@ -330,8 +329,7 @@ def attack_image_sword():
 
 def attackgif(weapons):
     if weapons == "sword":
-        #attack_image_sword() uncomented as I dont have the sword.png file
-        print("sword")
+        attack_image_sword()
 
 def spellgif(spell):
     if spell[1] == 1:
@@ -340,7 +338,7 @@ def spellgif(spell):
 
 #defining the players turn
 def playerturn(player,darkness):
-    global combatover
+    global combatOver
     global ehp,eend,edex,eint,estr,php,pend,pdex,pint,pstr,pw,pa
     global pchoice
 #-------------------------------------------------------------------------------
@@ -355,7 +353,7 @@ def playerturn(player,darkness):
         app.mainloop()
         #things after button is pressed
     elif buttons==FALSE:
-        pchoice=input()
+        pchoice=raw_input()
     if pchoice == "attack":
         attackgif(weapons)
         phit = pdex*random.randint(1,4) - edex
@@ -389,20 +387,20 @@ def playerturn(player,darkness):
             print("You fail to run away")
         if run > 3 or run==3:
             print("You manage to run away")
-            combatover = True
+            combatOver = True
     else:
         print("Error - command not recognised")
 
 # Running the actual turn
-def turn (player,darkness):
-    global combatover
+def turn(player,darkness):
+    global combatOver
     global ehp,eend,edex,eint,estr,php,pend,pdex,pint,pstr,pw,pa
     if pw[8] == 1:
         print("You have " + str(php) + " health")
         print("The enemy has " + str(ehp) + "health")
         print("Choose your action:")
         print("attack spell run")
-        pchoice = str(input())
+        pchoice = str(raw_input())
         if pchoice == "attack":
             phit = pdex*random.randint(1,4) - edex
             if phit > 0:
@@ -425,7 +423,7 @@ def turn (player,darkness):
                         print("The enemy is slain")
                         player[8][1] = player[8][1] + exp
                         levelupcheck()
-                        combatover = True
+                        combatOver = True
                 else:
                     print("you deal no damage")
             else:
@@ -440,7 +438,7 @@ def turn (player,darkness):
                 print("You fail to run away")
             if run > 3:
                 print("You manage to run away")
-                combatover = True
+                combatOver = True
     else:
         enemyturn()
         if php > 0:
@@ -449,19 +447,18 @@ def turn (player,darkness):
                 print("The enemy is slain")
                 player[8][0] = player[8][0] + exp
                 levelupcheck()
-                combatover = True
+                combatOver = True
         else:
             print("You died")
-            combatover = True
+            combatOver = True
 #image=classselect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja) #un comment tp start set up (class ect. each time the game starts (before the menu))
 
 def combat():
-    global combatover
+    global combatOver
     global player
-    statsetup (darkness,sakaretsu_armour,simple_katanna)
     no_combat=[2,3] #maps where combat will not be triggered
     if player[15] not in no_combat and combat_on==1:
-        combatover = False
+        combatOver = False
         background = pygame.image.load(os.path.join("backgrounds","combat_area.gif")) #load image for combat background
         screen.blit(background, (0,0)) #place this at 0,0
         you = pygame.image.load(os.path.join("combat","you.gif")) #load image for you
@@ -474,7 +471,7 @@ def combat():
         screen.blit(enemy, (500,100)) #place this at (500,100)
         pygame.display.flip() #update screen
         statsetup(darkness, sakaretsu_armour,simple_katanna)
-        while combatover == False:
+        while combatOver == False:
             turn (player,darkness)
         map_name="map"+str(player[15])+".gif"
         background = pygame.image.load(os.path.join("textures",map_name)) #when combat is finnished, load previous background
@@ -544,50 +541,43 @@ def debug(message,player):
     debug.write("\n")
     debug.close()
 #-----------------------------------------------------------------------------------
-def new_map(direction, playert):
-    global player, map_number
+def newMap(direction, playert):
+    global player
     hight=3 #the amount of vertical maps
     pygame.display.flip() #suppost to update whole map
     if direction=="up":
         move=player[15]/hight
-        player[15]=player[15]+1
-        map_number += 1
-        if str(map_number) == "1":
-            player[15] = map_number
+        if move.is_integer():
+            print("off edge of map")
         else:
-            player[15] = random.randint(2,9)
+             player[15]=player[15]+1
     elif direction=="down":
         move=(player[15]-1)/hight
-        player[15]=player[15]-1
-        map_number -= 1
-        if str(map_number) == "1":
-            player[15] = map_number
+        if move.is_integer():
+            print("off edge of map")
         else:
-            player[15] = random.randint(2,9)
+            player[15]=player[15]-1
     elif direction=="right":
         player[15]=player[15]+hight
-        map_number += hight
         move=hight**2-player[15]
-        player[15]=player[15]-hight
-        if str(map_number) == "1":
-            player[15] = 1
+        if move<hight**2:
+            print("on map")
         else:
-            player[15] = random.randint(2,9)
+            print("off edge of map")
+            player[15]=player[15]-hight
     elif direction=="left":
-        player[15]=player[15]-hight
-        map_number -= hight
-        if str(map_number) == "1":
-            player[15] = 1
+        if player[15]<=hight:
+            print("off edge of map")
         else:
-            player[15] = random.randint(2,9)
+            player[15]=player[15]-hight
     image_path="map"+str(player[15])+".gif"
     if os.path.isfile(image_path)==FALSE: #check that a map file exisits, if not then display an error message. Changing this to TRUE and moving to a new map will show the error message if you want to see it.
         img=pygame.image.load("map_error.gif")
-        #screen=pygame.display.set_mode((0,0))
+        screen=pygame.display.set_mode((0,0))
         screen.blit(img,(0,0))
     else:
         img=pygame.image.load(image_path)
-        #screen=pygame.display.set_mode((0,0))
+        screen=pygame.display.set_mode((0,0))
         screen.blit(img,(0,0))
     print("area",str(player[15]))
 #-----------------------------------------------------------------------------------------------------------------------------------------------
@@ -600,7 +590,6 @@ def message_display(text, x, y, font_size, colour):
     largeText = pygame.font.Font('freesansbold.ttf',font_size) #load font
     TextSurf, TextRect = text_objects(text, largeText, colour) #render text
     TextRect.center = ((x),(y)) #place text
-    #screen=pygame.display.set_mode((0,0)) uncomenting this lets fixes the screen not defined bug - but also causes problems displaying text if let uncommented.
     screen.blit(TextSurf, TextRect) #send to screen, needs to be updated/fliped to be worked
 
 #function for buttoms
@@ -644,17 +633,16 @@ def pause():
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 #menu function
 global menu
-def menu_close():
+def menuClose():
     global menu1
     print("menu removed")
     menu1=FALSE
 
-def new_game():
+def newGame():
     global menu1, image
     print("menu removed")
     menu1=FALSE
-    image=classselect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja)
-    save() #save a base copy of the game so that the deafult money and locations to load the save is created
+    image=classSelect(classes,lancer,archer,necromancer,warrior,mage,paladin,barbarian,samurai,ninja)
 
 def menu():
     global menu1
@@ -675,7 +663,7 @@ def start_menu():
     screen.fill(WHITE) #fill screen white
     while menu1==TRUE:
         for event in pygame.event.get():
-                button("new game",300,100,150,50,GREEN,DARKGREEN,BLACK,new_game)
+                button("new game",300,100,150,50,GREEN,DARKGREEN,BLACK,newGame)
                 button("load game",300,200,150,50,GREEN,DARKGREEN,BLACK,load)
                 button("quit to desktop",300,300,150,50,GREEN,DARKGREEN,BLACK,terminate)
                 pygame.display.flip()
@@ -688,48 +676,44 @@ def start_menu():
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 def save():
     global player_class
-    save_name=input("enter save name")
+    save_name=raw_input("enter save name")
     filename = str(save_name)
     if not os.path.exists(os.path.join("Saves",filename)):
-        os.makedirs(os.path.join("Saves",filename)) #create folder
-    f = open(os.path.join("Saves",filename,"location.txt"),"w")
-    f.write(str(player_class))
-    f.write('\n')
-    f.write(str(player[15]))
-    f.write("\n")
-    f.write(str(playert.x))
-    f.write("\n")
-    f.write(str(playert.y))
-    f.write("\n")
-    f.write(str(player[7]))
-    f.close()
-    if not os.path.exists(os.path.join("Saves",filename,"money_s.txt")):
-        f = open(os.path.join("Saves",filename,"money_s.txt"),"w")
-        f.write("60")
-        f.close
-    if not os.path.exists(os.path.join("Saves",filename,"money_m.txt")):
-        f = open(os.path.join("Saves",filename,"money_m.txt"),"w")
-        f.write("40")
-        f.close
-    if not os.path.exists(os.path.join("Saves",filename,"money_l.txt")):
-        f = open(os.path.join("Saves",filename,"money_l.txt"),"w")
-        f.write("20")
-        f.close
-    if not os.path.exists(os.path.join("Saves",filename,"money_x.txt")):
-        f = open(os.path.join("Saves",filename,"money_x.txt"),"w")
-        f.write("10")
-        f.close
+        os.makedirs(os.path.join("Saves",filename))
+        f = open(os.path.join("Saves",filename,"location.txt"),"w")
+        f.write(str(player_class))
+        f.write('\n')
+        f.write(str(player[15]))
+        f.write("\n")
+        f.write(str(playert.x))
+        f.write("\n")
+        f.write(str(playert.y))
+        f.write("\n")
+        f.write(str(player[7]))
+        f.close()
+    else:
+        f = open(os.path.join("Saves",filename,"location.txt"),"w")
+        f.write(str(player_class))
+        f.write('\n')
+        f.write(str(player[15]))
+        f.write("\n")
+        f.write(str(playert.x))
+        f.write("\n")
+        f.write(str(playert.y))
+        f.write("\n")
+        f.write(str(player[7]))
+        f.close()
 
 def load():
     root = tix.Tk()
 
-    def print_selected(args):
+    def printSelected(args):
         global playert, player, image, player_class
         print('selected dir:', args) #print selected save
         f = open(os.path.join(args,"location.txt"),"r")
         player_class=f.readline()
         player_class = player_class[:-1]
-        image=type_select(str(player_class))
+        image=typeSelect(str(player_class))
         player[15]=int(f.readline())
         map_name="map"+str(player[15])+".gif" #add back background after file is selected
         background = pygame.image.load(os.path.join("textures",map_name))
@@ -744,7 +728,7 @@ def load():
         root.destroy()
 
     def pathSelect():
-        d = tix.DirSelectDialog(master=root, command=print_selected)
+        d = tix.DirSelectDialog(master=root, command=printSelected)
         d.popup()
 
     button = Button(root, text="select file", command=pathSelect)
@@ -779,7 +763,7 @@ currentArmourMessage = "You are wearing: " #+ str(armour)
 unEquipArmourMessage = "You have unequiped your armour."
 unEquipWeaponMessage = "You have unequiped your weapon."
 
-save_game_to_use="name-test2"
+save_game_to_use="name test2"
 money=[]
 f = open(os.path.join("Saves",save_game_to_use,"money_s.txt"),"r")
 s_money=f.read()
@@ -798,8 +782,8 @@ money.append(int(m_money))
 money.append(int(l_money))
 money.append(int(x_money))
 
-global inventry
-inventry=[]
+global inventory
+inventory=[]
 #------------------------------------------------------------------------------------------------------------------------------------------------
 #shop functions
 def is_number(to_check):
@@ -900,7 +884,7 @@ def equipItem(obj, name, pequip):
     elif obj == 1:
         armour = name
         ##endurance += int(armour[1])
-        #screen.fill(BLACK)
+        screen.fill(BLACK)
         message_display(currentArmourMessage + str(name) + ".",400,20,16,WHITE)
         pygame.display.flip()
         file=open(os.path.join("Saves",save_game_to_use,"equip1.txt"),"w")
@@ -913,14 +897,14 @@ def equipItem(obj, name, pequip):
         pygame.display.flip()
 
 def pinventory():
-    global inventry, decide, pdecide
+    global inventory, decide, pdecide
     global armour, weapons
     screen.fill(BLACK)
     message_display("You are currently wearing: " + str(armour) + ". Your options are: unequip or equip",400,40,16,WHITE)
     pygame.display.flip()
-    pdecide=input()
+    pdecide=raw_input()
     if pdecide == "equip":
-        if len(inventry)==0:
+        if len(inventory)==0:
             screen.fill(BLACK)
             message_display("You havnt boughnt anything to equip",400,40,16,WHITE)
             pygame.display.flip()
@@ -931,18 +915,18 @@ def pinventory():
             length1=0
             y=20 #y position of first print
             screen.fill(BLACK)
-            while length1<len(inventry):
-                message_display("Item number "+str(length1)+" is "+inventry[length1][4],400,y,16,WHITE)
+            while length1<len(inventory):
+                message_display("Item number "+str(length1)+" is "+inventory[length1][4],400,y,16,WHITE)
                 pygame.display.flip()
                 length1 = length1 + 1
                 y=y+20 #gap inbetween each print
-            pequip = input("Enter item number")
+            pequip = raw_input("Enter item number")
             try:
                 pequip = int(pequip) #see if pequip is number
             except:
-                pequip=len(inventry)+1 #if not make a number which will be found to trigger Item not found alert bellow
-            if pequip<len(inventry):
-                equipItem(inventry[pequip][6],inventry[pequip][4],pequip)
+                pequip=len(inventory)+1 #if not make a number which will be found to trigger Item not found alert bellow
+            if pequip<len(inventory):
+                equipItem(inventory[pequip][6],inventory[pequip][4],pequip)
             else:
                 screen.fill(BLACK)
                 message_display("Item not found",400,40,16,WHITE)
@@ -1070,7 +1054,7 @@ f=open(os.path.join("Saves",save_game_to_use,"items.txt"),"r")
 amount1=amount1-1
 for i in range (amount1):
     item=f.readline()
-    inventry.append(items[int(item)])
+    inventory.append(items[int(item)])
 f.close()
 
 item_no=0
@@ -1080,11 +1064,11 @@ while item_no < len(items):
 
 file=open(os.path.join("Saves",save_game_to_use,"equip0.txt"),"r")
 pequip=int(file.readline())
-equipItem(inventry[pequip][6],inventry[pequip][4],pequip)
+#equipItem(inventory[pequip][6],inventMessage[pequip][4],pequip)
 file.close()
 file=open(os.path.join("Saves",save_game_to_use,"equip0.txt"),"r")
 pequip=int(file.readline())
-equipItem(inventry[pequip][6],inventry[pequip][4],pequip)
+#equipItem(inventory[pequip][6],inventory[pequip][4],pequip)
 file.close()
 
 prices=[]
@@ -1139,45 +1123,58 @@ while running:
                 else:
                     if playert.y!=580: #if play isnt at top of level
                         playert.y += cellSize
-                        after_movement(playert.x,playert.y,boss_list)
+                        afterMovement(playert.x,playert.y,boss_list)
                     else:
-                        new_map("down",playert) #load new map
-                        playert.y=0 #move player to top for new map
+                        if ((player[15]-1)/hight).is_integer(): #is player at very top
+                            print("cannot move off map")
+                        else:
+                            new_map("down",playert) #load new map
+                            playert.y=0 #move player to top for new map
+
             elif key[pygame.K_UP]:
-                movment_ok=collision_detection(playert.x,playert.y-cellSize,player)
+                movment_ok=collisionDetection(playert.x,playert.y-cellSize,player)
                 if movment_ok==False:
                     print("collision")
                 else:
                     if playert.y!=0: #if play isnt at top of level
                         playert.y -= cellSize
-                        after_movement(playert.x,playert.y,boss_list)
+                        afterMovement(playert.x,playert.y,boss_list)
                     else:
-                        new_map("up",playert) #load new map
-                        playert.y=580 #move player to buttom for new map
+                        if (player[15]/hight).is_integer(): #is player at very top
+                            print("cannot move off map")
+                        else:
+                            new_map("up",playert) #load new map
+                            playert.y=580 #move player to buttom for new map
 
             elif key[pygame.K_RIGHT]:
-                movment_ok=collision_detection(playert.x+cellSize,playert.y,player)
+                movment_ok=collisionDetection(playert.x+cellSize,playert.y,player)
                 if movment_ok==False:
                     print("collision")
                 else:
                     if playert.x!=780: #if play isnt on the right most map
                         playert.x += cellSize
-                        after_movement(playert.x,playert.y,boss_list)
+                        afterMovement(playert.x,playert.y,boss_list)
                     else:
-                        new_map("right",playert) #load new map
-                        playert.x=0 #move player to left for new map
+                        if player[15]>hight**2-hight: #is player at very top
+                            print( "cannot move off map")
+                        else:
+                            new_map("right",playert) #load new map
+                            playert.x=0 #move player to left for new map
 
             elif key[pygame.K_LEFT]:
-                movment_ok=collision_detection(playert.x-cellSize,playert.y,player)
+                movment_ok=collisionDetection(playert.x-cellSize,playert.y,player)
                 if movment_ok==False:
                     print("collision")
                 else:
                     if playert.x!=0: #if play isnt on the left most map
                         playert.x -= cellSize
-                        after_movement(playert.x,playert.y,boss_list)
+                        afterMovement(playert.x,playert.y,boss_list)
                     else:
-                        new_map("left",playert) #load new map
-                        playert.x=780 #move player to right for new map
+                        if player[15]<=hight: #is player at far left
+                            print( "cannot move off map")
+                        else:
+                            new_map("left",playert) #load new map
+                            playert.x=780 #move player to right for new map
             elif key[pygame.K_p]:
                 print("paused")
                 pause()
@@ -1192,15 +1189,15 @@ while running:
             elif key[pygame.K_s]:
                 shop = 1
                 while shop==1:
-                    instruction=input("What would you like to do?")
+                    instruction=raw_input("What would you like to do?")
                     if instruction==("\money"):
                         screen.fill(BLACK)
                         message_display("small orbs " + str(money[0]) + ", medium orbs " + str(money[1]) + ", large orbs " + str(money[2]) + ", special orbs " +str(money[3]),400,30,16,WHITE)
                         pygame.display.flip()
 
                     elif instruction==("\+money"):
-                        type=input("Small, Medium, Large or Special")
-                        amount=int(input("How much?"))
+                        type=raw_input("Small, Medium, Large or Special")
+                        amount=int(raw_input("How much?"))
                         if type=="S" or type=="M" or type=="L" or type=="X":
                             change(money, type, amount)
                         else:
@@ -1212,7 +1209,7 @@ while running:
                         message_display("Please wait, loading",400,20,16,WHITE)
                         pygame.display.flip()
                         screen.fill(BLACK)
-                        player_class=input("enter player class number (1-7)")
+                        player_class=raw_input("enter player class number (1-7)")
                         y=20
                         while loop<length:
                             if items[loop][5]==0 or items[loop][5]==int(player_class):
@@ -1221,7 +1218,7 @@ while running:
                             loop=loop+1
                         message_display("Type \"leave\" to leave shop",400,y,16,WHITE)
                         pygame.display.flip()
-                        to_buy=input("Input item number to buy")
+                        to_buy=raw_input("Input item number to buy")
                         check=is_number(to_buy) #check user has entered a number
                         #check="TRUE" #uncomment to accept letters
                         if check=="TRUE":
@@ -1239,7 +1236,7 @@ while running:
                                             pygame.display.flip()
                                         else:
                                             change(money,type,amount)
-                                            inventry.append(items[int(to_buy)])
+                                            inventory.append(items[int(to_buy)])
                                             save_item(to_buy)
                                             file = open(os.path.join("Saves",save_game_to_use,"money_s.txt"),"w")
                                             file.write(str(money[0]))
@@ -1253,7 +1250,7 @@ while running:
                                             pygame.display.flip()
                                         else:
                                             change(money,type,amount)
-                                            inventry.append(items[int(to_buy)])
+                                            inventory.append(items[int(to_buy)])
                                             save_item(to_buy)
                                             file = open(os.path.join("Saves",save_game_to_use,"money_m.txt"),"w")
                                             file.write(str(money[1]))
@@ -1267,7 +1264,7 @@ while running:
                                             pygame.display.flip()
                                         else:
                                             change(money,type,amount)
-                                            inventry.append(items[int(to_buy)])
+                                            inventory.append(items[int(to_buy)])
                                             save_item(to_buy)
                                             file = open(os.path.join("Saves",save_game_to_use,"money_l.txt"),"w")
                                             file.write(str(money[2]))
@@ -1281,7 +1278,7 @@ while running:
                                             pygame.display.flip()
                                         else:
                                             change(money,type,amount)
-                                            inventry.append(items[int(to_buy)])
+                                            inventory.append(items[int(to_buy)])
                                             save_item(to_buy)
                                             file = open(os.path.join("Saves",save_game_to_use,"money_x.txt"),"w")
                                             file.write(str(money[3]))
@@ -1315,7 +1312,7 @@ while running:
                                 y=y+16
                             loop=loop+1
                         pygame.display.flip()
-                        to_buy=input("Input item number to get data on")
+                        to_buy=raw_input("Input item number to get data on")
                         check=is_number(to_buy) #check user has entered a number
                         #check="TRUE" #uncomment to accept letters
                         if check=="TRUE":
@@ -1361,25 +1358,6 @@ while running:
                 map_name="map"+str(player[15])+".gif" #add back background after menu
                 background = pygame.image.load(os.path.join("textures",map_name))
                 screen.blit(background, (0,0))
-            elif key[pygame.K_r]:
-                return_home = input("Would you like to return to the home base. Enter Y or N")
-                return_home = return_home.lower()
-                if return_home == "y":
-                    if mana_use >= 10:
-                        print(mana_use)
-                        mana_use -= 10
-                        global player, map_number, mana, mana_use
-                        map_number = 1
-                        player[15] = 1
-                        image_path="map"+str(player[15])+".gif"
-                        if os.path.isfile(image_path)==FALSE: #check that a map file exisits, if not then display an error message. Changing this to TRUE and moving to a new map will show the error message if you want to see it.
-                            img=pygame.image.load("map_error.gif")
-                            #screen=pygame.display.set_mode((0,0))
-                            screen.blit(img,(0,0))
-                        else:
-                            img=pygame.image.load(image_path)
-                            #screen=pygame.display.set_mode((0,0))
-                            screen.blit(img,(0,0))
             clock.tick(10)
             screen.blit(image, (playert.x, playert.y))
             print(playert.x)
